@@ -36,7 +36,7 @@ moment.updateLocale('us', {
 	holidayFormat: 'YYYY-MM-DD'
 })
 
-const getPaymentDates = (deliveryDate, installmentsCount) => {
+const getPaymentDatesWithLateDate = (deliveryDate, installmentsCount) => {
 	if (!installmentsCount || installmentsCount < 1)
 		throw new Error('installmentsCount must be greater than 0')
 	if (!deliveryDate || !moment(deliveryDate).isValid())
@@ -46,26 +46,42 @@ const getPaymentDates = (deliveryDate, installmentsCount) => {
 
 	for (let index = 0; index < installmentsCount; index++) {
 		const sourceDate =
-			index === 0 ? deliveryDate : paymentDates[paymentDates.length - 1]
+			index === 0
+				? deliveryDate
+				: paymentDates[paymentDates.length - 1].paymentDate
 		let newDate = moment(sourceDate).add(30, 'day')
+		const newDateMonth = moment(newDate).month()
+		const sourceDateMonth = moment(sourceDate).month()
+		if (newDateMonth === sourceDateMonth) {
+			//move newDate to first of next month
+			const firstOfNextMonth = moment({
+				year: moment(newDate).year(),
+				month: moment(newDate).month() === 11 ? 0 : moment(newDate).month() + 1,
+				day: 1
+			})
+			newDate = firstOfNextMonth
+		}
+
+		const newDateFormatted = moment(newDate).format('YYYY-MM-DD')
+
 		if (!newDate.isBusinessDay()) {
 			//note, newDate.isBusinessDay() will be false if date is a weekend or a holiday
-			const newDateFormatted = moment(newDate.nextBusinessDay()).format(
+			const lateAfterDate = moment(newDate.nextBusinessDay()).format(
 				'YYYY-MM-DD'
 			)
-			paymentDates.push(newDateFormatted)
+			paymentDates.push({ paymentDate: newDateFormatted, lateAfterDate })
 		} else {
-			const newDateFormatted = moment(newDate).format('YYYY-MM-DD')
-			paymentDates.push(newDateFormatted)
+			const lateAfterDate = moment(newDate).format('YYYY-MM-DD')
+			paymentDates.push({ paymentDate: newDateFormatted, lateAfterDate })
 		}
 	}
 	return paymentDates
 }
 
 app.listen(port, () => {
-	const deliveryDate = '2022-11-26'
-	const installmentsCount = 4
-	const dates = getPaymentDates(deliveryDate, installmentsCount)
+	const deliveryDate = '2023-01-31'
+	const installmentsCount = 20
+	const dates = getPaymentDatesWithLateDate(deliveryDate, installmentsCount)
 	console.log('deliveryDate: ', deliveryDate)
 	console.log('installments count: ', installmentsCount)
 	console.log('payment dates: ', dates)
