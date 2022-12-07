@@ -7,7 +7,6 @@ const christmas2022 = '2022-12-26'
 const newYears2023 = '2023-01-02'
 const mlkDay2023 = '2023-01-16'
 const washingtonsBday2023 = '2023-02-20'
-const cesarChavezDay2023 = '2023-03-31'
 const memorialDay2023 = '2023-05-29'
 const juneTeenth2023 = '2023-06-19'
 const independenceDay2023 = '2023-07-04'
@@ -21,7 +20,6 @@ const holidaysArr = [
 	newYears2023,
 	mlkDay2023,
 	washingtonsBday2023,
-	cesarChavezDay2023,
 	memorialDay2023,
 	juneTeenth2023,
 	independenceDay2023,
