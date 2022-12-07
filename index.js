@@ -52,11 +52,7 @@ const getPaymentDatesWithLateDate = (deliveryDate, installmentsCount) => {
 		const sourceDateMonth = moment(sourceDate).month()
 		if (newDateMonth === sourceDateMonth) {
 			//move newDate to first of next month
-			const firstOfNextMonth = moment({
-				year: moment(newDate).year(),
-				month: moment(newDate).month() === 11 ? 0 : moment(newDate).month() + 1,
-				day: 1
-			})
+			const firstOfNextMonth = moment(newDate).add(1, 'M').startOf('month')
 			newDate = firstOfNextMonth
 		}
 
